@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Alunos{% endblock %}
+{% block content %}
+<h1 class="mb-4">Alunos Cadastrados</h1>
+<a href="{{ url_for('adicionar_aluno') }}" class="btn btn-success mb-3">Adicionar Novo Aluno</a>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome Completo</th>
+                <th>CPF</th>
+                <th>Telefone</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for aluno in alunos %}
+            <tr>
+                <td>{{ aluno.id }}</td>
+                <td>{{ aluno.nome }} {{ aluno.sobrenome }}</td>
+                <td>{{ aluno.cpf }}</td>
+                <td>{{ aluno.telefone }}</td>
+                <td>
+                    <a href="{{ url_for('lista_pagamentos_aluno', aluno_id=aluno.id) }}" class="btn btn-sm btn-info">Pagamentos</a>
+                    <a href="{{ url_for('editar_aluno', aluno_id=aluno.id) }}" class="btn btn-sm btn-warning">Editar</a>
+                    <form action="{{ url_for('excluir_aluno', aluno_id=aluno.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja excluir este aluno? Todos os pagamentos também serão excluídos!');">
+                        <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5">Nenhum aluno cadastrado.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

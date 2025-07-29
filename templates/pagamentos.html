@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Pagamentos de {{ aluno.nome }}{% endblock %}
+{% block content %}
+<h1 class="mb-4">Pagamentos de {{ aluno.nome }} {{ aluno.sobrenome }}</h1>
+<a href="{{ url_for('adicionar_pagamento', aluno_id=aluno.id) }}" class="btn btn-success mb-3">Registrar Novo Pagamento</a>
+<a href="{{ url_for('lista_alunos') }}" class="btn btn-secondary mb-3 ms-2">Voltar para Alunos</a>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Valor</th>
+                <th>Data Pagamento</th>
+                <th>Data Vencimento</th>
+                <th>Status</th>
+                <th>Descrição</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pagamento in pagamentos %}
+            <tr>
+                <td>{{ pagamento.id }}</td>
+                <td>R$ {{ "%.2f"|format(pagamento.valor) }}</td>
+                <td>{{ pagamento.data_pagamento.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td>{{ pagamento.data_vencimento.strftime('%d/%m/%Y') if pagamento.data_vencimento else 'N/A' }}</td>
+                <td><span class="badge {% if pagamento.status == 'Pago' %}bg-success{% elif pagamento.status == 'Pendente' %}bg-warning text-dark{% else %}bg-danger{% endif %}">{{ pagamento.status }}</span></td>
+                <td>{{ pagamento.descricao or 'N/A' }}</td>
+                <td>
+                    <form action="{{ url_for('excluir_pagamento', pagamento_id=pagamento.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja excluir este pagamento?');">
+                        <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7">Nenhum pagamento registrado para este aluno.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

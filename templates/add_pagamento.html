@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h2 class="mb-4">{{ title }} para {{ aluno.nome }} {{ aluno.sobrenome }}</h2>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <div class="mb-3">
+                {{ form.valor.label(class="form-label") }}
+                {{ form.valor(class="form-control") }}
+                {% for error in form.valor.errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+            </div>
+            <div class="mb-3">
+                {{ form.data_vencimento.label(class="form-label") }}
+                {{ form.data_vencimento(class="form-control") }}
+                {% for error in form.data_vencimento.errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+            </div>
+            <div class="mb-3">
+                {{ form.status.label(class="form-label") }}
+                {{ form.status(class="form-control") }}
+                {% for error in form.status.errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+            </div>
+            <div class="mb-3">
+                {{ form.descricao.label(class="form-label") }}
+                {{ form.descricao(class="form-control") }}
+                {% for error in form.descricao.errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+            </div>
+            {{ form.submit(class="btn btn-primary") }}
+            <a href="{{ url_for('lista_pagamentos_aluno', aluno_id=aluno.id) }}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
