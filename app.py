@@ -5,6 +5,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, Length
+# Inicialize db e login_manager com a instância do app
+init_app_models(app, db, login_manager)
+login_manager.login_view = 'login' # Define a rota para o login
+
+from flask_login import login_user, logout_user, login_required, current_user
 
 # Carregar variáveis de ambiente do arquivo .env
 load_dotenv()
@@ -38,7 +43,7 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
-        if user and user.check_password(form.password.data):
+        if user and check_password_hash(user.password_hash, form.password.data):
             login_user(user)
             next_page = request.args.get('next')
             flash('Login realizado com sucesso!', 'success')
@@ -147,11 +152,15 @@ def excluir_pagamento(pagamento_id):
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all() 
-        if not User.query.filter_by(username='admin').first():
-            hashed_password = generate_password_hash('admin123', method='pbkdf2:sha256')
-            admin_user = User(username='admin', password_hash=hashed_password)
+        db.create_all() # Cria as tabelas do banco de dados
+        # Opcional: Criar um admin inicial se não existir
+        initial_admin_username = os.getenv('INITIAL_ADMIN_USERNAME', 'admin')
+        initial_admin_password = os.getenv('INITIAL_ADMIN_PASSWORD', 'admin123')
+
+        if not User.query.filter_by(username=initial_admin_username).first():
+            hashed_password = generate_password_hash(initial_admin_password, method='pbkdf2:sha256')
+            admin_user = User(username=initial_admin_username, password_hash=hashed_password)
             db.session.add(admin_user)
             db.session.commit()
-            print("Usuário 'admin' criado com senha 'admin123'")
+            print(f"Usuário '{initial_admin_username}' criado com a senha inicial.")
     app.run(debug=True)
