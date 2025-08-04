@@ -15,8 +15,9 @@ init_app_models(app, db, login_manager)
 load_dotenv()
 
 # Configurações (pegando do .env para deploy)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'Senha123')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432/academia_db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 from models import db, login_manager, User, Aluno, Pagamento, init_app_models
