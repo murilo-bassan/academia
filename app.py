@@ -3,36 +3,31 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, redirect, url_for, flash, request
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
-from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired, Length
 from flask_login import login_user, logout_user, login_required, current_user
 from models import db, login_manager, User, Aluno, Pagamento, init_app_models
-login_manager.login_view = 'login' # Define a rota para o login
+from forms import LoginForm, AlunoForm, PagamentoForm
+
+
+# Criação da instância do aplicativo Flask
 app = Flask(__name__)
-init_app_models(app, db, login_manager)
 
 # Carregar variáveis de ambiente do arquivo .env
 load_dotenv()
 
-# Configurações (pegando do .env para deploy)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+# Configurações do aplicativo (Lendo do ambiente)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'Senha123')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432/academia_db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-from models import db, login_manager, User, Aluno, Pagamento, init_app_models
-
+# Inicializa as extensões com o app (isso DEVE vir DEPOIS de app.config)
 init_app_models(app, db, login_manager)
 login_manager.login_view = 'login' # Define a rota para o login
-
-from flask_login import login_user, logout_user, login_required, current_user
-from forms import LoginForm, AlunoForm, PagamentoForm
 
 
 # --- Rotas Básicas ---
 @app.route('/')
 def index():
-    return redirect(url_for('login')) # Redireciona para a tela de login
+    return redirect(url_for('login'))
 
 # --- Rotas de Autenticação ---
 @app.route('/login', methods=['GET', 'POST'])
@@ -142,7 +137,7 @@ def adicionar_pagamento(aluno_id):
 @login_required
 def excluir_pagamento(pagamento_id):
     pagamento = Pagamento.query.get_or_404(pagamento_id)
-    aluno_id = pagamento.aluno_id # Captura o ID do aluno antes de excluir
+    aluno_id = pagamento.aluno_id
     db.session.delete(pagamento)
     db.session.commit()
     flash('Pagamento excluído com sucesso!', 'success')
@@ -151,8 +146,7 @@ def excluir_pagamento(pagamento_id):
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all() # Cria as tabelas do banco de dados
-        # Opcional: Criar um admin inicial se não existir
+        db.create_all()
         initial_admin_username = os.getenv('INITIAL_ADMIN_USERNAME', 'admin')
         initial_admin_password = os.getenv('INITIAL_ADMIN_PASSWORD', 'admin123')
 
