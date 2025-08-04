@@ -8,12 +8,11 @@ from wtforms.validators import DataRequired, Length
 from flask_login import login_user, logout_user, login_required, current_user
 from models import db, login_manager, User, Aluno, Pagamento, init_app_models
 login_manager.login_view = 'login' # Define a rota para o login
+app = Flask(__name__)
 init_app_models(app, db, login_manager)
 
 # Carregar variáveis de ambiente do arquivo .env
 load_dotenv()
-
-app = Flask(__name__)
 
 # Configurações (pegando do .env para deploy)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'Senha123')
