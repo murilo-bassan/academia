@@ -5,10 +5,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, Length
-login_manager.login_view = 'login' # Define a rota para o login
-
 from flask_login import login_user, logout_user, login_required, current_user
 from models import db, login_manager, User, Aluno, Pagamento, init_app_models
+login_manager.login_view = 'login' # Define a rota para o login
 init_app_models(app, db, login_manager)
 
 # Carregar variáveis de ambiente do arquivo .env
