@@ -23,6 +23,21 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 init_app_models(app, db, login_manager)
 login_manager.login_view = 'login' # Define a rota para o login
 
+# Este bloco cria as tabelas no banco de dados. Ele deve rodar
+# em todos os deploys para garantir que o banco de dados esteja atualizado.
+with app.app_context():
+    db.create_all()
+    # Opcional: Criar um admin inicial se não existir
+    initial_admin_username = os.getenv('INITIAL_ADMIN_USERNAME', 'admin')
+    initial_admin_password = os.getenv('INITIAL_ADMIN_PASSWORD', 'admin123')
+
+    if not User.query.filter_by(username=initial_admin_username).first():
+        hashed_password = generate_password_hash(initial_admin_password, method='pbkdf2:sha256')
+        admin_user = User(username=initial_admin_username, password_hash=hashed_password)
+        db.session.add(admin_user)
+        db.session.commit()
+        print(f"Usuário '{initial_admin_username}' criado com a senha inicial.")
+
 
 # --- Rotas Básicas ---
 @app.route('/')
@@ -145,15 +160,4 @@ def excluir_pagamento(pagamento_id):
 
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        initial_admin_username = os.getenv('INITIAL_ADMIN_USERNAME', 'admin')
-        initial_admin_password = os.getenv('INITIAL_ADMIN_PASSWORD', 'admin123')
-
-        if not User.query.filter_by(username=initial_admin_username).first():
-            hashed_password = generate_password_hash(initial_admin_password, method='pbkdf2:sha256')
-            admin_user = User(username=initial_admin_username, password_hash=hashed_password)
-            db.session.add(admin_user)
-            db.session.commit()
-            print(f"Usuário '{initial_admin_username}' criado com a senha inicial.")
     app.run(debug=True)
