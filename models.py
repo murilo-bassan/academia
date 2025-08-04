@@ -52,12 +52,9 @@ class Pagamento(db.Model):
 
 # Este é o HOOK que o app.py usará para inicializar db e login_manager
 def init_app_models(app_instance, db_instance, login_manager_instance):
-    """Inicializa os objetos db e login_manager com a instância do Flask app."""
     db_instance.init_app(app_instance)
     login_manager_instance.init_app(app_instance)
 
-    # Configura o user_loader DENTRO da função de inicialização,
-    # para garantir que User já foi definido.
     @login_manager_instance.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
